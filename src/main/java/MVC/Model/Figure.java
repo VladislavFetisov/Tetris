@@ -1,5 +1,7 @@
 package MVC.Model;
 
+import java.util.Arrays;
+
 public class Figure {
     private final Coord metaInitialCoord;
     private RotationMode rotation;
@@ -14,13 +16,15 @@ public class Figure {
     public Coord[] getCoord() {
         return figureForm.getForm().generateFigure(metaInitialCoord, rotation);
     }
-    public Coord[] getRotatedCoords(){
+
+    public Coord[] getRotatedCoords() {
         return figureForm.getForm().generateFigure(metaInitialCoord, RotationMode.getNextRotationFrom(rotation));
     }
 
-    public void rotate(){
+    public void rotate() {
         rotation = RotationMode.getNextRotationFrom(rotation);
     }
+
     public Coord[] getShiftedCoord(ShiftDirection direction) {
         Coord newInitialPoint = null;
         switch (direction) {
@@ -33,8 +37,9 @@ public class Figure {
         }
         return figureForm.getForm().generateFigure(newInitialPoint, rotation);
     }
-    public void shift(ShiftDirection direction){
-        switch (direction){
+
+    public void shift(ShiftDirection direction) {
+        switch (direction) {
             case LEFT:
                 metaInitialCoord.x--;
                 break;
@@ -42,6 +47,15 @@ public class Figure {
                 metaInitialCoord.x++;
                 break;
         }
+    }
+
+    public Coord[] getFallenCoord() {
+        Coord newInitialCoord = new Coord(metaInitialCoord.x, metaInitialCoord.y - 1);
+        return figureForm.getForm().generateFigure(newInitialCoord, rotation);
+    }
+
+    public void fall() {
+        metaInitialCoord.y--;
     }
 
 }

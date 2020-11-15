@@ -25,11 +25,11 @@ public class View extends Application {
 
     }
 
-    public static boolean isIsRotateRequested() {
+    public static boolean getIsRotateRequested() {
         return isRotateRequested;
     }
 
-    public static boolean isIsBoostRequested() {
+    public static boolean getIsBoostRequested() {
         return isBoostRequested;
     }
 
@@ -44,20 +44,20 @@ public class View extends Application {
         root.getChildren().add(loader.load());
 
         Scene scene = new Scene(root);
-        scene.addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
             switch (keyEvent.getCode()) {
-                case KP_RIGHT:
+                case RIGHT:
                     shiftDirection = RIGHT;
                     System.out.println("вправо");
                     break;
-                case A:
+                case LEFT:
                     shiftDirection = LEFT;
                     System.out.println("влево");
                     break;
-                case S:
+                case DOWN:
                     isBoostRequested = true;
                     break;
-                case W:
+                case UP:
                     isRotateRequested = true;
                     break;
             }

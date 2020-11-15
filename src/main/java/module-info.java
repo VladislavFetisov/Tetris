@@ -2,6 +2,7 @@ module MVC {
     requires javafx.fxml;
     requires javafx.graphics;
     requires javafx.controls;
+    exports MVC.Model;
     exports MVC.Controller;
     exports MVC.View;
     opens MVC.View;
