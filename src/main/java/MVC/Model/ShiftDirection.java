@@ -1,5 +1,5 @@
 package MVC.Model;
 
 public enum ShiftDirection {
-    NOWHERE, LEFT, RIGHT
+    LEFT, RIGHT
 }

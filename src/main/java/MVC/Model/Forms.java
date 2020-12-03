@@ -81,17 +81,17 @@ public enum Forms {
                     case INVERT:
                         ret[0] = initialCoord;
                         ret[1] = new Coord(initialCoord.x + 1, initialCoord.y);
-                        ret[2] = new Coord(initialCoord.x + 1, initialCoord.y - 1);
-                        ret[3] = new Coord(initialCoord.x + 1, initialCoord.y - 2);
+                        ret[2] = new Coord(initialCoord.x + 1, initialCoord.y + 1);
+                        ret[3] = new Coord(initialCoord.x + 1, initialCoord.y + 2);
                         break;
                     case FLIP_CCW:
-                        ret[0] = new Coord(initialCoord.x, initialCoord.y - 1);
-                        ret[1] = new Coord(initialCoord.x + 1, initialCoord.y - 1);
-                        ret[2] = new Coord(initialCoord.x + 2, initialCoord.y - 1);
+                        ret[0] = new Coord(initialCoord.x, initialCoord.y + 1);
+                        ret[1] = new Coord(initialCoord.x + 1, initialCoord.y + 1);
+                        ret[2] = new Coord(initialCoord.x + 2, initialCoord.y + 1);
                         ret[3] = new Coord(initialCoord.x + 2, initialCoord.y);
                         break;
                     case FLIP_CW:
-                        ret[0] = new Coord(initialCoord.x, initialCoord.y - 1);
+                        ret[0] = new Coord(initialCoord.x, initialCoord.y + 1);
                         ret[1] = initialCoord;
                         ret[2] = new Coord(initialCoord.x + 1, initialCoord.y);
                         ret[3] = new Coord(initialCoord.x + 2, initialCoord.y);

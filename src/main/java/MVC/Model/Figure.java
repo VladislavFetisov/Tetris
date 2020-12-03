@@ -1,7 +1,5 @@
 package MVC.Model;
 
-import java.util.Arrays;
-
 public class Figure {
     private final Coord metaInitialCoord;
     private RotationMode rotation;
@@ -11,6 +9,9 @@ public class Figure {
         this.metaInitialCoord = metaInitialCoord;
         this.rotation = currentRotation;
         this.figureForm = figureForm;
+    }
+    public FigureForm getFigureForm() {
+        return figureForm;
     }
 
     public Coord[] getCoord() {
@@ -50,12 +51,13 @@ public class Figure {
     }
 
     public Coord[] getFallenCoord() {
-        Coord newInitialCoord = new Coord(metaInitialCoord.x, metaInitialCoord.y - 1);
+        Coord newInitialCoord = new Coord(metaInitialCoord.x, metaInitialCoord.y + 1);
         return figureForm.getForm().generateFigure(newInitialCoord, rotation);
     }
 
     public void fall() {
-        metaInitialCoord.y--;
+        metaInitialCoord.y++;
     }
+
 
 }
