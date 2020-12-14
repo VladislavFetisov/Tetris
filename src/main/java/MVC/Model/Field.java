@@ -3,15 +3,23 @@ package MVC.Model;
 import javafx.scene.layout.GridPane;
 
 import java.util.Arrays;
+import java.util.List;
 
-import static MVC.Model.FigureForm.I;
-import static MVC.Model.RotationMode.NORMAL;
+import static MVC.Model.ShiftDirection.LEFT;
 
 public class Field {
 
     private final static int width = 10;
     private final static int ceil = 3;
     private final static int height = width * 2 + ceil;
+
+    private Figure figure;//Фигура,которая падает в данный момент
+
+    private static final int[][] field = new int[width][height];
+
+    public static int getCeil() {
+        return ceil;
+    }
 
     public static int getHeight() {
         return height;
@@ -21,13 +29,12 @@ public class Field {
         return width;
     }
 
-    private Figure figure;//Фигура,которая падает в данный момент
+    public Figure getFigure() {
+        return figure;
+    }
 
-    private static int[][] field = new int[width][height];
-
-
-    public boolean setInitialFigure() {
-        figure = new Figure(new Coord(4, 3), NORMAL, I);
+    public boolean setInitialFigure(RotationMode rotationMode, FigureForm figureForm) {
+        figure = new Figure(new Coord(4, ceil), rotationMode, figureForm);
         return putFigureOnDesk(figure.getCoord());
     }
 
@@ -47,6 +54,7 @@ public class Field {
         return true;
     }
 
+
     public boolean tryRotateFigure() {
         Coord[] rotatedCoord = figure.getRotatedCoords();
         for (Coord coord : rotatedCoord) {
@@ -64,7 +72,7 @@ public class Field {
     public boolean tryFallFigure() {
         Coord[] fallenCoord = figure.getFallenCoord();
         for (Coord coord : fallenCoord) {
-            if (coord.y < 0 || coord.y >= height) {
+            if (coord.y < ceil || coord.y >= height) {
                 return false;
             }
             if (field[coord.x][coord.y] == 1 &&
@@ -79,7 +87,20 @@ public class Field {
         return true;
     }
 
-    private static boolean putFigureOnDesk(Coord[] coordinates) {
+    public boolean tryElevateFigure() {
+        Coord[] elevatedCoord = figure.getElevatedCoord();
+        for (Coord coord : elevatedCoord) {
+            if (coord.y < ceil) return false;
+        }
+
+        clearFigureOnDesk(figure.getCoord());
+        figure.elevate();
+        putFigureOnDesk(elevatedCoord);
+
+        return true;
+    }
+
+    public boolean putFigureOnDesk(Coord[] coordinates) {
         for (Coord coord : coordinates) {
             if (field[coord.x][coord.y] == 1) return false;
             field[coord.x][coord.y] = 1;
@@ -87,7 +108,7 @@ public class Field {
         return true;
     }
 
-    private static boolean clearFigureOnDesk(Coord[] coordinates) {
+    public boolean clearFigureOnDesk(Coord[] coordinates) {
         for (Coord coord : coordinates) {
             if (field[coord.x][coord.y] == 0) return false;
             field[coord.x][coord.y] = 0;
@@ -95,11 +116,61 @@ public class Field {
         return true;
     }
 
+    public int getFigureMaxY() {
+        int maxY = 0;
+        for (Coord coord : figure.getCoord())
+            if (Field.getHeight() - coord.y > maxY) maxY = Field.getHeight() - coord.y;
+        return maxY;
+    }
+
+    public int getCurrentHeight() {
+        for (int i = Field.getCeil(); i < Field.getHeight(); i++) {
+            for (int j = 0; j < Field.getWidth(); j++)
+                if (field[j][i] == 1) return Field.getHeight() - i;
+        }
+        return 0;
+    }
+
+    public Pair getAmountOfHoles() {
+        int holesCount = 0, highestHoleY = Field.getHeight();
+        for (int i = getFigureMinXY().y; i < Field.getHeight(); i++) {
+            for (int j = getFigureMinXY().x; j <= getFigureMaxXY().x; j++) {
+                if (field[j][i] == 0 && i != getFigureMinXY().y) {
+                    holesCount++;
+                    if (i < highestHoleY) highestHoleY = Field.getHeight() - i;
+                }
+            }
+        }
+        if (holesCount != 0) return new Pair(holesCount, highestHoleY);
+        else return new Pair(0, 0);
+    }
+
+    public Coord getFigureMinXY() {
+        int minX = Field.getWidth();
+        int minY = Field.getHeight();
+
+        for (Coord coord : figure.getCoord()) {
+            if (coord.x < minX) minX = coord.x;
+            if (coord.y < minY) minY = coord.y;
+        }
+        return new Coord(minX, minY);
+    }
+
+    public Coord getFigureMaxXY() {
+        int maxX = -1;
+        int maxY = Field.getCeil();
+
+        for (Coord coord : figure.getCoord()) {
+            if (coord.x > maxX) maxX = coord.x;
+            if (coord.y > maxY) maxY = coord.y;
+        }
+        return new Coord(maxX, maxY);
+    }
 
     public void tryDestroyLines(GridPane gridPane) {
         int countInLine = 0;
         int k;
-        for (int i = getHeight() - 1; i > 3; i--) {
+        for (int i = getHeight() - 1; i > ceil; i--) {
             for (int j = 0; j < getWidth(); j++) if (field[j][i] == 1) countInLine++;
 
             k = i - 1;//разница i-k= кол-во линий,которое необходимо сломать
@@ -137,9 +208,19 @@ public class Field {
         return false;
     }
 
-    public Figure getFigure() {
-        return figure;
+    public int amountOfSupposingDestLines() {
+        int amountOfDestroyingLines = 0;
+        int count = 0;
+        for (Coord coord : figure.getCoord()) {
+            for (int i = 0; i < Field.getWidth(); i++) {
+                if (field[i][coord.y] == 1) count++;
+            }
+            if (count == Field.getWidth()) amountOfDestroyingLines++;
+            count = 0;
+        }
+        return amountOfDestroyingLines;
     }
+
 
     @Override
     public String toString() {

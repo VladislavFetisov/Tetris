@@ -19,8 +19,8 @@ public enum RotationMode {
 
     private static final RotationMode[] rotationByNumber = {NORMAL, FLIP_CCW, INVERT, FLIP_CW};
 
-    public static RotationMode getNextRotationFrom(RotationMode perviousRotation) {
-        int newRotationIndex = (perviousRotation.number + 1) % rotationByNumber.length;
+    public static RotationMode getNextRotationFrom(RotationMode previousRotation) {
+        int newRotationIndex = (previousRotation.number + 1) % rotationByNumber.length;
         return rotationByNumber[newRotationIndex];
     }
 }

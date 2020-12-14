@@ -19,7 +19,7 @@ public enum FigureForm {
         this.form = form;
         this.color = color;
     }
-    private final static FigureForm[] FIGURE_FORM_ARRAY = new FigureForm[]{O, I, S, Z, L, J, T};
+    private final static FigureForm[] FIGURE_FORM_ARRAY = new FigureForm[]{ S, Z, L, J, T};
 
     public static FigureForm getRandomFigureForm() {
         return FIGURE_FORM_ARRAY[(int) Math.floor(Math.random() * FIGURE_FORM_ARRAY.length)];

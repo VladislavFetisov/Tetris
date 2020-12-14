@@ -2,6 +2,11 @@ package MVC.Model;
 
 public class Figure {
     private final Coord metaInitialCoord;
+
+    public RotationMode getRotation() {
+        return rotation;
+    }
+
     private RotationMode rotation;
     private final FigureForm figureForm;
 
@@ -10,6 +15,7 @@ public class Figure {
         this.rotation = currentRotation;
         this.figureForm = figureForm;
     }
+
     public FigureForm getFigureForm() {
         return figureForm;
     }
@@ -55,9 +61,16 @@ public class Figure {
         return figureForm.getForm().generateFigure(newInitialCoord, rotation);
     }
 
+    public Coord[] getElevatedCoord() {
+        Coord newInitialCoord = new Coord(metaInitialCoord.x, metaInitialCoord.y - 1);
+        return figureForm.getForm().generateFigure(newInitialCoord, rotation);
+    }
+
     public void fall() {
         metaInitialCoord.y++;
     }
 
-
+    public void elevate() {
+        metaInitialCoord.y--;
+    }
 }

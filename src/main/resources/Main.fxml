@@ -5,7 +5,7 @@
 
 <AnchorPane prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MVC.Controller.Main">
    <children>
-      <GridPane fx:id="gridPane" layoutX="484.0" layoutY="112.0" prefHeight="575.0" prefWidth="225.0">
+      <GridPane fx:id="gridPane" layoutX="489.0" layoutY="35.0" prefHeight="575.0" prefWidth="225.0">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -45,5 +45,6 @@
         </rowConstraints>
       </GridPane>
       <Button fx:id="startButton" layoutX="159.0" layoutY="145.0" mnemonicParsing="false" onMouseDragReleased="#startGame" prefHeight="77.0" prefWidth="124.0" text="Start!" />
+      <Button fx:id="AIButton" layoutX="159.0" layoutY="284.0" mnemonicParsing="false" onAction="#aITurnOn" prefHeight="77.0" prefWidth="124.0" text="AI" />
    </children>
 </AnchorPane>

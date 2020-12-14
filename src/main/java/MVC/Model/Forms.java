@@ -107,12 +107,17 @@ public enum Forms {
     O_FORM(
             (initialCoord, rotation) -> {
                 Coord[] ret = new Coord[4];
-
-                ret[0] = initialCoord;
-                ret[1] = new Coord(initialCoord.x, initialCoord.y + 1);
-                ret[2] = new Coord(initialCoord.x + 1, initialCoord.y + 1);
-                ret[3] = new Coord(initialCoord.x + 1, initialCoord.y);
-
+                switch (rotation) {
+                    case NORMAL:
+                    case INVERT:
+                    case FLIP_CCW:
+                    case FLIP_CW:
+                        ret[0] = initialCoord;
+                        ret[1] = new Coord(initialCoord.x, initialCoord.y + 1);
+                        ret[2] = new Coord(initialCoord.x + 1, initialCoord.y + 1);
+                        ret[3] = new Coord(initialCoord.x + 1, initialCoord.y);
+                        break;
+                }
                 return ret;
             }
     ),
