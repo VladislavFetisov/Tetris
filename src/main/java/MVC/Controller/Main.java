@@ -104,7 +104,7 @@ public class Main {
             int height = tetrisBoard.getCurrentHeight();
             HashSet<Integer> bestXs = new HashSet<>(4);
             boolean ready;
-            while (tetrisBoard.setInitialFigure(NORMAL, FigureForm.getRandomFigureForm())) {
+            while (tetrisBoard.setInitialFigure(NORMAL, FigureForm.I)) {
                 FigureForm currentFigureForm = tetrisBoard.getFigure().getFigureForm();
 
                 solver.solve(tetrisBoard, height);
@@ -112,18 +112,15 @@ public class Main {
                 RotationMode bestRotation = solver.getBestRotation();
                 Coord[] bestCoord = solver.getBestCoord();
 
-                System.out.println(bestRotation);
-                System.out.println(Arrays.toString(bestCoord));
-                System.out.println(currentFigureForm);
 
                 tetrisBoard.clearFigureOnDesk(tetrisBoard.getFigure().getCoord());
                 tetrisBoard.setInitialFigure(bestRotation, currentFigureForm);
-                System.out.println(tetrisBoard.toString());
+
                 while (tetrisBoard.tryShiftFigure(RIGHT)) {
                 }
 
                 for (Coord coord : bestCoord) bestXs.add(coord.x);
-                System.out.println(bestXs.toString());
+
                 ready = false;
                 while (!ready) {
                     ready = true;

@@ -13,7 +13,6 @@ import static MVC.Model.ShiftDirection.RIGHT;
 public class Solver {
     private Coord[] bestCoord;
     private RotationMode bestRotation;
-    private final Coord initial = new Coord(4, Field.getCeil());
 
     public Coord[] getBestCoord() {
         return bestCoord;
@@ -26,7 +25,7 @@ public class Solver {
     public void solve(Field board, int height) {
         int minPenalty = 100000;
         int holesCreated, holeHeight, heightAdded, lineCleared;
-
+        int currentMinPenalty;
         // line cleared соответсвует c коэффициенту с отрицательным весом
 
 
@@ -35,16 +34,19 @@ public class Solver {
             RotationMode currentRotation = board.getFigure().getRotation();
 
             while (board.tryShiftFigure(LEFT)) {
-                System.out.println(board.toString());
             }
+
 
             for (int k = 0; k < Field.getWidth(); k++) {//идем по всей ширине поля вправо
 
                 heightAdded = height;
-                System.out.println(height+"height");
+
+
                 while (board.tryFallFigure()) {//опускаем фигуру до возможного
-                    System.out.println(board.toString());
                 }
+                System.out.println(board.toString());
+                System.out.println(Arrays.toString(board.getFigure().getCoord())+"координаты после падения");
+
 
                 if (board.getFigureMaxY() > heightAdded) {//определили добавленную высоту
                     heightAdded = board.getFigureMaxY() - heightAdded;
@@ -54,19 +56,26 @@ public class Solver {
                 holesCreated = pair.getFirst();
                 holeHeight = pair.getSecond();
                 lineCleared = board.amountOfSupposingDestLines();
+                System.out.println(board);
                 System.out.println(holeHeight + " hh" + holesCreated + " hc" + lineCleared + " lc" + heightAdded + " ha");
 
-                int currentMinPenalty = geneticAlgorithm(holesCreated, holeHeight, lineCleared, heightAdded);
-                System.out.println(currentMinPenalty+"currentMinPenalty");
+                currentMinPenalty = geneticAlgorithm(holesCreated, holeHeight, lineCleared, heightAdded);
+                System.out.println(currentMinPenalty+"current");
+
+
                 if (currentMinPenalty < minPenalty) {
                     minPenalty = currentMinPenalty;
                     bestRotation = currentRotation;
-                    bestCoord = board.getFigure().getCoord();
+                    Coord[] coords=board.getFigure().getCoord();
+                    bestCoord =Arrays.copyOf(coords,4) ;
                 }
-
+                System.out.println(minPenalty+"minPenalty");
+                System.out.println(Arrays.toString(bestCoord));
+                System.out.println(bestRotation);
                 while (board.tryElevateFigure()) { //подняли фигуру наверх
                 }
-                System.out.println(board.toString());
+
+
                 if (!board.tryShiftFigure(RIGHT)) {
                     board.clearFigureOnDesk(board.getFigure().getCoord());
                     break;
@@ -74,7 +83,7 @@ public class Solver {
 
             }
             board.setInitialFigure(RotationMode.getNextRotationFrom(currentRotation), board.getFigure().getFigureForm());
-            System.out.println(board);
+
         }
     }
 
