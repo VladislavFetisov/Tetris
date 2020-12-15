@@ -36,7 +36,6 @@ public class Solver {
             while (board.tryShiftFigure(LEFT)) {
             }
 
-
             for (int k = 0; k < Field.getWidth(); k++) {//идем по всей ширине поля вправо
 
                 heightAdded = height;
@@ -44,9 +43,6 @@ public class Solver {
 
                 while (board.tryFallFigure()) {//опускаем фигуру до возможного
                 }
-                System.out.println(board.toString());
-                System.out.println(Arrays.toString(board.getFigure().getCoord())+"координаты после падения");
-
 
                 if (board.getFigureMaxY() > heightAdded) {//определили добавленную высоту
                     heightAdded = board.getFigureMaxY() - heightAdded;
@@ -56,22 +52,20 @@ public class Solver {
                 holesCreated = pair.getFirst();
                 holeHeight = pair.getSecond();
                 lineCleared = board.amountOfSupposingDestLines();
-                System.out.println(board);
-                System.out.println(holeHeight + " hh" + holesCreated + " hc" + lineCleared + " lc" + heightAdded + " ha");
+
 
                 currentMinPenalty = geneticAlgorithm(holesCreated, holeHeight, lineCleared, heightAdded);
-                System.out.println(currentMinPenalty+"current");
+
 
 
                 if (currentMinPenalty < minPenalty) {
                     minPenalty = currentMinPenalty;
                     bestRotation = currentRotation;
-                    Coord[] coords=board.getFigure().getCoord();
-                    bestCoord =Arrays.copyOf(coords,4) ;
+                    Coord[] coords = Arrays
+                            .stream(board.getFigure().getCoord()).map(coord -> new Coord(coord.x, coord.y)).toArray(Coord[]::new);
+                    bestCoord = Arrays.copyOf(coords, 4);
                 }
-                System.out.println(minPenalty+"minPenalty");
-                System.out.println(Arrays.toString(bestCoord));
-                System.out.println(bestRotation);
+
                 while (board.tryElevateFigure()) { //подняли фигуру наверх
                 }
 
@@ -100,7 +94,7 @@ public class Solver {
         ArrayList<Integer> sortedFitnessList = new ArrayList<>();
         ArrayList<Chromosome> bests = new ArrayList<>(30);
 
-        for (int i = 0; i < 1; i++) {//повторяем цикл 50 раз
+        for (int i = 0; i < 2; i++) {//повторяем цикл 50 раз
             for (Map.Entry<Chromosome, Integer> entry : generationWithFitness.entrySet()) {//имеем 100 особей со своим fitness
                 generationWithFitness.replace(entry.getKey(), entry.getKey().fitness(holesCreated, holeHeight, lineCleared, heightAdded));
             }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MVC.Controller.EndOfTheGame">
+   <children>
+      <Button fx:id="button" layoutX="123.0" layoutY="136.0" mnemonicParsing="false" onAction="#restart" prefHeight="62.0" prefWidth="120.0" text="Начать заново!" />
+      <Button layoutX="386.0" layoutY="136.0" mnemonicParsing="false" onAction="#end" prefHeight="62.0" prefWidth="120.0" text="Закончить игру" />
+   </children>
+</AnchorPane>

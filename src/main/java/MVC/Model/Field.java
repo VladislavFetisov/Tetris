@@ -3,9 +3,6 @@ package MVC.Model;
 import javafx.scene.layout.GridPane;
 
 import java.util.Arrays;
-import java.util.List;
-
-import static MVC.Model.ShiftDirection.LEFT;
 
 public class Field {
 

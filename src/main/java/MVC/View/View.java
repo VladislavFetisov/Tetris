@@ -24,7 +24,6 @@ public class View extends Application {
         Scene scene = new Scene(root);
 
         primaryStage.setTitle("Tetris");
-        //primaryStage.getIcons().add());
         primaryStage.setScene(scene);
         primaryStage.show();
 

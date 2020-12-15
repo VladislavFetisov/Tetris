@@ -1,12 +1,17 @@
 package MVC.Controller;
 
 import MVC.Model.*;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
-import java.util.Arrays;
+import java.io.IOException;
 import java.util.HashSet;
 
 import static MVC.Model.RotationMode.NORMAL;
@@ -21,9 +26,14 @@ public class Main {
     private static Field tetrisBoard;
     private static boolean isFigureStatic;
 
-
     public void initialize() {
-        startButton.addEventHandler(MouseEvent.MOUSE_PRESSED, mouseEvent -> startGame());
+        startButton.addEventHandler(MouseEvent.MOUSE_PRESSED, mouseEvent -> {
+            try {
+                startGame();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
 
         for (int i = 0; i < Field.getWidth(); i++) {
             for (int j = 0; j < Field.getHeight(); j++) {
@@ -39,7 +49,7 @@ public class Main {
 
     }
 
-    public void startGame() {
+    public void startGame() throws IOException {
         Visualiser visualiser = new Visualiser();
         startButton.setDisable(true);
         AIButton.setDisable(true);
@@ -68,6 +78,7 @@ public class Main {
                     break;
             }
         });
+
         new Thread(() -> {
             while (tetrisBoard.setInitialFigure(NORMAL, FigureForm.getRandomFigureForm())) {
                 visualiser.drawFigure(tetrisBoard.getFigure());
@@ -75,23 +86,29 @@ public class Main {
                     try {
                         Thread.sleep(1000);
                         visualiser.wipeOffFigure(tetrisBoard.getFigure());
-                        tetrisBoard.tryFallFigure();
                         if (!tetrisBoard.tryFallFigure()) {
                             isFigureStatic = true;
                             visualiser.drawFigure(tetrisBoard.getFigure());
                             tetrisBoard.tryDestroyLines(gridPane);
                         } else visualiser.drawFigure(tetrisBoard.getFigure());
-                        System.out.println(tetrisBoard.toString());
 
                     } catch (InterruptedException ignored) {
                     }
                 }
                 isFigureStatic = false;
-                if (tetrisBoard.isOverfilled()) break;
+                if (tetrisBoard.isOverfilled()) {
+                    break;
+                }
             }
-        }).start();
+            Platform.runLater(() -> {
+                try {
+                    end();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-        //endOfthegame()
+            });
+        }).start();
     }
 
     public void aITurnOn() {
@@ -104,7 +121,7 @@ public class Main {
             int height = tetrisBoard.getCurrentHeight();
             HashSet<Integer> bestXs = new HashSet<>(4);
             boolean ready;
-            while (tetrisBoard.setInitialFigure(NORMAL, FigureForm.I)) {
+            while (tetrisBoard.setInitialFigure(NORMAL, FigureForm.getRandomFigureForm())) {
                 FigureForm currentFigureForm = tetrisBoard.getFigure().getFigureForm();
 
                 solver.solve(tetrisBoard, height);
@@ -132,13 +149,10 @@ public class Main {
                         }
                     }
                 }
-
-
                 visualiser.drawFigure(tetrisBoard.getFigure());
-
                 while (!isFigureStatic) {
                     try {
-                        Thread.sleep(250);
+                        Thread.sleep(100);
                         visualiser.wipeOffFigure(tetrisBoard.getFigure());
                         if (!tetrisBoard.tryFallFigure()) {
                             isFigureStatic = true;
@@ -153,13 +167,45 @@ public class Main {
                 }
                 isFigureStatic = false;
                 if (tetrisBoard.isOverfilled()) break;
+
             }
+            Platform.runLater(() -> {
+                try {
+                    end();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            });
         }).start();
+
     }
 
     private static void gameInit() {
         isFigureStatic = false;
         tetrisBoard = new Field();
+    }
+
+    private void end() throws IOException {
+        try {
+            Group root = new Group();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EndOfTheGame.fxml"));
+            root.getChildren().add(loader.load());
+
+            Scene secondScene = new Scene(root);
+
+            Stage newWindow = new Stage();
+            newWindow.setTitle("Конец игры");
+            newWindow.setScene(secondScene);
+
+            Stage stage = (Stage) startButton.getScene().getWindow();
+            stage.close();
+
+            newWindow.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private class Visualiser {
