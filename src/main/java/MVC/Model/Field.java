@@ -164,6 +164,14 @@ public class Field {
         return new Coord(maxX, maxY);
     }
 
+    public void clearDesk() {
+        for (int i = 0; i < Field.getHeight(); i++) {
+            for (int j = 0; j < Field.getWidth(); j++) {
+                field[j][i] = 0;
+            }
+        }
+    }
+
     public void tryDestroyLines(GridPane gridPane) {
         int countInLine = 0;
         int k;

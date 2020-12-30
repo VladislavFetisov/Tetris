@@ -23,8 +23,8 @@ public class Main {
     public Button startButton;
     public Button AIButton;
 
-    private static Field tetrisBoard;
-    private static boolean isFigureStatic;
+    private Field tetrisBoard;
+    private boolean isFigureStatic;
 
     public void initialize() {
         startButton.addEventHandler(MouseEvent.MOUSE_PRESSED, mouseEvent -> {
@@ -46,7 +46,6 @@ public class Main {
                 if (j < Field.getCeil()) cell.setVisible(false);
             }
         }
-
     }
 
     public void startGame() throws IOException {
@@ -77,6 +76,7 @@ public class Main {
                     visualiser.drawFigure(tetrisBoard.getFigure());
                     break;
             }
+
         });
 
         new Thread(() -> {
@@ -100,13 +100,13 @@ public class Main {
                     break;
                 }
             }
+            tetrisBoard.clearDesk();
             Platform.runLater(() -> {
                 try {
                     end();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
             });
         }).start();
     }
@@ -117,6 +117,8 @@ public class Main {
         Visualiser visualiser = new Visualiser();
         Solver solver = new Solver();
         gameInit();
+        solver.createInitialGeneration(100);
+
         new Thread(() -> {
             int height = tetrisBoard.getCurrentHeight();
             HashSet<Integer> bestXs = new HashSet<>(4);
@@ -149,6 +151,7 @@ public class Main {
                         }
                     }
                 }
+
                 visualiser.drawFigure(tetrisBoard.getFigure());
                 while (!isFigureStatic) {
                     try {
@@ -169,6 +172,7 @@ public class Main {
                 if (tetrisBoard.isOverfilled()) break;
 
             }
+            tetrisBoard.clearDesk();
             Platform.runLater(() -> {
                 try {
                     end();
@@ -178,10 +182,9 @@ public class Main {
 
             });
         }).start();
-
     }
 
-    private static void gameInit() {
+    private void gameInit() {
         isFigureStatic = false;
         tetrisBoard = new Field();
     }

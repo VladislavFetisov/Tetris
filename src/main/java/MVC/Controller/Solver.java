@@ -13,6 +13,13 @@ import static MVC.Model.ShiftDirection.RIGHT;
 public class Solver {
     private Coord[] bestCoord;
     private RotationMode bestRotation;
+    private final HashMap<Chromosome, Integer> generationWithFitness = new HashMap<>();
+    private final ArrayList<Chromosome> bests = new ArrayList<>();
+    private final ArrayList<Chromosome> worsts = new ArrayList<>();
+
+    public HashMap<Chromosome, Integer> getGenerationWithFitness() {
+        return generationWithFitness;
+    }
 
     public Coord[] getBestCoord() {
         return bestCoord;
@@ -26,6 +33,7 @@ public class Solver {
         int minPenalty = 100000;
         int holesCreated, holeHeight, heightAdded, lineCleared;
         int currentMinPenalty;
+
         // line cleared соответсвует c коэффициенту с отрицательным весом
 
 
@@ -54,8 +62,7 @@ public class Solver {
                 lineCleared = board.amountOfSupposingDestLines();
 
 
-                currentMinPenalty = geneticAlgorithm(holesCreated, holeHeight, lineCleared, heightAdded);
-
+                currentMinPenalty = countPenalty(holesCreated, holeHeight, lineCleared, heightAdded);
 
 
                 if (currentMinPenalty < minPenalty) {
@@ -77,70 +84,62 @@ public class Solver {
 
             }
             board.setInitialFigure(RotationMode.getNextRotationFrom(currentRotation), board.getFigure().getFigureForm());
-
         }
+
+
+        ArrayList<Chromosome> newGeneration = Chromosome.crossBreeds(bests, 100);
+        Chromosome.mutation(newGeneration);
+
+        for (int i = 0; i < 20; i++) {
+            newGeneration.set((int) (Math.random()* newGeneration.size()), worsts.get((int) (Math.random() * worsts.size())));
+        }
+        generationWithFitness.clear();
+        for (Chromosome chromosome : newGeneration) generationWithFitness.put(chromosome, 0);
+
+        bests.clear();
     }
 
-    private int geneticAlgorithm(int holesCreated, int holeHeight, int lineCleared, int heightAdded) {
-        HashMap<Chromosome, Integer> generationWithFitness = new HashMap<>();
+    private int countPenalty(int holesCreated, int holeHeight, int lineCleared, int heightAdded) {
         int max = 100000;
-        for (int i = 0; i < 100; i++) {//начальное поколение из 100 особей
+        ArrayList<Integer> sortedFitnessList = new ArrayList<>();
+
+        for (Map.Entry<Chromosome, Integer> entry : generationWithFitness.entrySet()) {//имеем 100 особей со своим fitness
+            generationWithFitness.replace(entry.getKey(), entry.getKey().fitness(holesCreated, holeHeight, lineCleared, heightAdded));
+        }
+        for (Map.Entry<Chromosome, Integer> entry : generationWithFitness.entrySet()) {
+            sortedFitnessList.add(entry.getValue());
+        }
+        insertionSort(sortedFitnessList);
+
+        boolean first = false, second = false;
+        if (sortedFitnessList.get(0) < max) {
+            max = sortedFitnessList.get(0);//выбрали лучшую хромосому
+            for (Map.Entry<Chromosome, Integer> entry : generationWithFitness.entrySet()) {
+                if (entry.getValue() == max) {
+                    bests.add(entry.getKey());
+                    first = true;
+                }
+                if (entry.getValue().equals(sortedFitnessList.get(sortedFitnessList.size() - 1))) {
+                    worsts.add(entry.getKey());
+                    second = true;
+                }
+                if (first && second) break;
+            }
+        }
+        sortedFitnessList.clear();
+
+        return max;
+    }
+
+    public void createInitialGeneration(int amount) {
+        for (int i = 0; i < amount; i++) {
             generationWithFitness.put(new Chromosome((int) Math.floor(Math.random() * 500),
                     (int) Math.floor(Math.random() * 500),
                     (int) Math.floor(Math.random() * -500),
-                    (int) Math.floor(Math.random() * 500)), 0);//положили хромосому с начальным fitness
+                    (int) Math.floor(Math.random() * 500)), 0);
         }
-        int j;
-        ArrayList<Integer> sortedFitnessList = new ArrayList<>();
-        ArrayList<Chromosome> bests = new ArrayList<>(30);
-
-        for (int i = 0; i < 2; i++) {//повторяем цикл 50 раз
-            for (Map.Entry<Chromosome, Integer> entry : generationWithFitness.entrySet()) {//имеем 100 особей со своим fitness
-                generationWithFitness.replace(entry.getKey(), entry.getKey().fitness(holesCreated, holeHeight, lineCleared, heightAdded));
-            }
-
-
-            for (Map.Entry<Chromosome, Integer> entry : generationWithFitness.entrySet()) {
-                sortedFitnessList.add(entry.getValue());
-            }
-
-            insertionSort(sortedFitnessList);
-
-
-            if (sortedFitnessList.get(0) < max) max = sortedFitnessList.get(0);//выбрали лучшую хромосому
-
-
-            j = 0;
-            for (Map.Entry<Chromosome, Integer> entry : generationWithFitness.entrySet()) {
-                if (sortedFitnessList.indexOf(entry.getValue()) < 30) {
-                    bests.add(entry.getKey());
-                    j++;
-                }
-                if (j == 30) break;
-            }
-
-            ArrayList<Chromosome> newGeneration = Chromosome.crossBreeds(bests, 100);
-            Chromosome.mutation(newGeneration);
-
-            j = 0;
-            for (Map.Entry<Chromosome, Integer> entry : generationWithFitness.entrySet()) {
-                if (sortedFitnessList.indexOf(entry.getValue()) > 70) {
-                    newGeneration.remove((int) (Math.random() * (newGeneration.size())));
-                    newGeneration.add(entry.getKey()); //заполнили поколение 30 самыми слабыми родителями
-                    j++;
-                }
-                if (j == 30) break;
-            }
-
-
-            for (Chromosome chromosome : newGeneration) generationWithFitness.put(chromosome, 0);
-
-            bests.clear();
-            sortedFitnessList.clear();
-
-        }
-        return max;
     }
+
 
     public static void insertionSort(List<Integer> list) {
         for (int i = 1; i < list.size(); i++) {
@@ -154,7 +153,7 @@ public class Solver {
         }
     }
 
-    private static class Chromosome {
+    public static class Chromosome {
         private int a, b, c, d;
         private static final int PARAMETERS_COUNT = 4;
 
@@ -175,9 +174,6 @@ public class Solver {
             for (int i = 0; i < countOfChildren; i++) {
                 Chromosome firstParent = list.get((int) (Math.random() * (list.size())));
                 Chromosome secondParent = list.get((int) (Math.random() * (list.size())));
-                while (secondParent.equals(firstParent)) {
-                    secondParent = list.get((int) (Math.random() * (list.size())));
-                }
                 result.add(firstParent.crossover(secondParent));
             }
             return result;

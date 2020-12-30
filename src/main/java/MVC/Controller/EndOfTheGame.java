@@ -1,7 +1,7 @@
 package MVC.Controller;
 
 import MVC.View.View;
-import javafx.event.ActionEvent;
+import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
